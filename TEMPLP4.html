@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>REDANDBLACK</title>
+<style type="text/css">
+	img{
+		width: 100px;
+	}
+
+</style>
+	
+	</head>
+	
+
+<body>
+	<table border=15>
+<tr>
+	<td><img src="deck/blank.gif" onmouseover ="overr(0);"></td>
+	<td><img src="deck/blank.gif" onmouseover ="overr(1);"></td>
+	<td><img src="deck/blank.gif" onmouseover ="overr(2);"></td>
+	<td><img src="deck/blank.gif" onmouseover ="overr(3);"></td>
+	<td><img src="deck/blank.gif" onmouseover ="overr(4);"></td>
+</tr>
+</table>
+ <br><button onclick="datvla();">დათვლა</button>
+<p id="shedegi"> </p>
+<script type="text/javascript">
+	var kartebi=["6a","6g","6j","6k"
+		              ,"7a","7g","7j","7k"
+					  ,"8a","8g","8j","8k"
+					  ,"9a","9g","9j","9k"
+					  ,"10a","10g","10j","10k"
+					  ,"va","vg","vj","vk"
+					  ,"da","dg","dj","dk"
+					  ,"ka","kg","kj","kk"
+					  ,"ta","tg","tj","tk"];
+
+
+var Ferebi=["წ","წ","შ","შ",
+"წ","წ","შ","შ",
+"წ","წ","შ","შ",
+"წ","წ","შ","შ",
+"წ","წ","შ","შ",
+"წ","წ","შ","შ",
+"წ","წ","შ","შ",
+"წ","წ","შ","შ",
+"წ","წ","შ","შ"];
+
+var CountRed=0;
+var CountBlack=0;
+
+function overr(i){
+	 var pc=Math.floor(Math.random()*36);
+document.images[i].src = "deck/" + kartebi[pc] + ".gif";
+if(Ferebi[pc]=="წ"){
+CountRed++;
+}
+
+else{
+	CountBlack++;
+}
+}
+function datvla(){
+document.getElementById("shedegi").innerHTML="წითლების რაოდენობა ="+CountRed+" "+"შავების რაოდენობა ="+CountBlack;
+
+}
+
+</script>
+
+
+
+
+
+</body>
+
+
+</html>
