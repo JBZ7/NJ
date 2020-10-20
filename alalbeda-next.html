@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+     <head>
+<meta charset="utf-8">
+    <title>ალალბედა</title>
+    <link rel="stylesheet" href="alal.css">
+    <style>
+    	p{
+    		color:red;
+    	}
+
+    </style>
+
+     </head>
+
+
+<body>
+<marquee style ="font-size: 50px;"> Game Alalbeda </marquee>
+<p id="Shedegi" style="color:#e01919; font-size: 30px;"></p>
+<p id="qulebi"></p>
+<script>
+	var me=0;
+	var pc=0;
+	for(var i=0;i<100;i++)
+	{var x=Math.random();
+		if(x>0.5){
+			me++;
+		}
+		else pc++;
+		document.getElementById("qulebi").innerHTML="ME-"+me+: +pc+"pc"
+		if(me>pc){
+          document.getElementById("shedegi").style.color ="green";
+			document.getElementById("Shedegi").innerHTML = "moigeT";
+		}
+		else{
+			document.getElementById("Shedegi").innerHTML = "waage";
+		}
+
+	}
+	var x=Math.random();
+	if(x > 0.5){
+	document.getElementById("Shedegi").innerHTML ="U win";
+	document.getElementById("shedegi").style.color ="green";
+	}
+		else document.getElementById("Shedegi").innerHTML ="U lose";
+	document.getElementById("shedegi").style.color ="red";
+
+
+</script>
+
+
+
+
+</body>
+
+
+</html>
