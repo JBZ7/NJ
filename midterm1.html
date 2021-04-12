@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>დომინო</title>
+	</head>
+	
+	<body>
+	    <p id="result"></p>
+	    <p id="result_1"></p>
+		<img src="qvebi" alt="ქვა" id="im1" height="50"> <!--cheatelement DOM-იდან-->
+		<button onclick="myFunction()">Try it</button>
+		<script>
+		   var qvebi = ["0-0","0-1","0-2","0-3","0-4","0-5","0-6"
+					   ,"1-1","1-2","1-3","1-4","1-5","1-6"
+					   ,"2-2","2-3","2-4","2-5","2-6"
+					   ,"3-3","3-4","3-5","3-6"
+					   ,"4-4","4-5","4-6"
+					   ,"5-5","5-6"
+					   ,"6-6"
+		               ];
+         
+		  
+		   for(var j = 0; j < 7; j++)
+			     {
+			     	for(var i = j; i < 7; i++)
+			     {
+				   
+				   qvebi=qvebi+j+"-"+i+"*" }
+			     }
+
+			   var qvebi_D = qvebi.split("*");
+			   document.getElementById("result").innerHTML=qvebi;
+			  document.getElementById("result_1").innerHTML=qvebi_D;
+
+			  	function myFunction() {
+			  	
+			  		var pc=Math.floor(Math.random()*27);
+			  		
+  document.getElementById("im1").innerHTML=document.images[0].src="qvebi/"+qvebi_D[pc]+".png";
+
+   var qvebi_T = document.createElement("img");
+  qvebi_T.src = document.images[0].src="qvebi/"+qvebi_D[pc]+".png";
+  document.body.appendChild(qvebi_T);
+}
+			   
+			   
+
+			 
+		</script>
+
+	</body>
+</html>
