@@ -1,0 +1,232 @@
+﻿--17 
+--გამოიტანეთ იმ პირების გვარი და სახელი, რომელთა გვარი მთავრდება s სიმბოლოზე და ჰყავთ კატა. მესამე 
+--სვეტში გამოიტანეთ კატის სახელი; --5
+	select o.Surname,o.Name,p.Name from dbo.Owners o
+	join dbo.Pets p  on p.OwnerID=o.OwnerID
+	join dbo.PetTypes pt on pt.PetTypeId=p.PetTypeId
+	where o.Surname like '%s' and pt.Name = 'cat'
+--18
+--გამოიტანეთ ცხოველების სახელები, რომლებსაც ჩაუტარდათ ორთოპედიული პროცედურა (ORTHOPEDIC) 
+--საკუთარ დაბადების წელს. მეორე და მესამე სვეტში გამოიტანეთ დაბადების წელი და პროცედურის 
+--ჩატარების თარიღი; --10
+
+	select p.Name,p.BirthYear,prh.ProcedureDate from dbo.Pets p
+	join dbo.ProceduresHistory prh on p.PetId=prh.PetID
+	join dbo.Procedures pr on pr.ProcedureId=prh.ProcedureId
+	join dbo.ProcedureTypes prt on prt.ProcedureTypeId=pr.ProcedureTypeId
+	where prt.Name like 'ortho%' and year(prh.ProcedureDate)=p.BirthYear
+--19
+--გამოიტანეთ ქალაქ Dutton-ში მცხოვრები პირების გვარი და სახელი, რომლებმაც საკუთარ თუთიყუშს 
+--ჩაუტარეს სამედიცინო პროცედურა 2016 წლის ოქტომბრის მეორე ნახევარში. მესამე სვეტში გამოიტანეთ 
+--თუთიყუშის სახელი. თუ თუთიყუშის ამ პერიოდში პროცედურა ჩაუტარდა რამდენიმეჯერ, გამოტანისას მისი 
+--და მფლობელის მონაცემები გამოიტანეთ მხოლოდ ერთხელ;--0
+	select  distinct o.Surname,o.Name,p.Name from dbo.Owners o  
+	join dbo.Pets p on p.OwnerID=o.OwnerID
+	join dbo.PetTypes pt on pt.PetTypeId=p.PetTypeId
+	join dbo.ProceduresHistory prh on prh.PetID=p.PetId
+	where o.City='dutton'
+	and pt.Name = 'Parrot' and year(prh.ProcedureDate)=2016
+	 and month(prh.ProcedureDate)=10 and day(prh.ProcedureDate)>15
+--20
+--გამოიტანეთ ყველაზე იაფფასიანი პროცედურების აღწერა (Description) და ფასი (Price);--15
+	select pr.Description,pr.Price from dbo.Procedures pr where pr.ProcedureId in (
+		select min(pr1.Price) from dbo.Procedures pr1
+	)
+--21--5
+	select count(o.Name) as 'Count' from dbo.Owners o where o.OwnerID in (
+		select p.OwnerID from dbo.Pets p where p.PetTypeId in (
+		select pt.PetTypeId from dbo.PetTypes pt where pt.Name in ('god','cat')
+		)
+	)
+	and o.City in ('detroit','lansing')
+--22--9
+	select distinct prh.ProcedureDate from dbo.ProceduresHistory prh where prh.ProcedureId in (
+	
+	select  pr.ProcedureId from  dbo.Procedures pr where pr.Price<
+		(			
+		select avg(pr1.Price) from dbo.Procedures pr1
+		)
+	)
+	and month(prh.ProcedureDate)=1 and year(prh.ProcedureDate)=2016
+--23	
+	select count(prh.PetID) as 'count',pt.Name from dbo.ProceduresHistory prh 
+	join 	dbo.Pets p on p.PetId=prh.PetID
+	join	dbo.PetTypes pt on p.PetTypeId=pt.PetTypeId
+	group by pt.Name
+
+--24
+	select  prt.Name,min(pr.Price) as 'Min Price' from dbo.ProcedureTypes prt
+	join dbo.Procedures pr on pr.ProcedureTypeId=prt.ProcedureTypeId
+	group by prt.Name 
+
+	
+	
+--27
+	INSERT [dbo].[Procedures] ([ProcedureTypeId], [Description], [Price])
+	 VALUES ((select prt1.ProcedureTypeId from dbo.ProcedureTypes prt1 where prt1.name ='GROOMING'),'removes the undercoat',17)
+--28
+
+	update [dbo].[Pets] set OwnerID= (
+		select o.OwnerID from Owners o where o.Name='luisa' and o.Surname='Cuellar'
+	)
+	 where Name='Jake' and PetTypeId = (
+		select pt.PetTypeId from PetTypes pt where pt.Name='dog'
+	)
+--29
+
+	update [dbo].[Procedures] set Price=Price*0.92 where ProcedureTypeId = (
+	select prt.ProcedureTypeId from dbo.ProcedureTypes prt where prt.Name='GENERAL SURGERIES'
+	)
+	and Price>480
+
+--30
+	--
+	delete dbo.ProceduresHistory where MONTH(ProcedureDate)=9 and year(ProcedureDate)=2016 
+	and ProcedureId in
+	(select ProcedureId from dbo.Procedures pr where pr.ProcedureTypeId=(
+	select prt.ProcedureTypeId from dbo.ProcedureTypes prt where prt.Name='VACCINATIONS'
+	)
+	)
+
+
+
+
+--ცხრილების გაერთიანება join ოპერატორის საშუალებით 
+--17. გამოიტანეთ იმ პირების გვარი და სახელი, რომელთა გვარი მთავრდება s სიმბოლოზე და ჰყავთ კატა. მესამე 
+--სვეტში გამოიტანეთ კატის სახელი; 
+select o.Surname, o.Name, p.Name from [dbo].[Owners] o 
+join [dbo].[Pets] p on p.OwnerID=o.OwnerID 
+join [dbo].[PetTypes] t on t.PetTypeId=p.PetTypeId 
+where o.Surname like '%s' and t.Name='cat'
+--18. გამოიტანეთ ცხოველების სახელები, რომლებსაც ჩაუტარდათ ორთოპედიული პროცედურა (ORTHOPEDIC) 
+--საკუთარ დაბადების წელს. მეორე და მესამე სვეტში გამოიტანეთ დაბადების წელი და პროცედურის 
+--ჩატარების თარიღი; 
+select p.Name, p.BirthYear, h.ProcedureDate  from [dbo].[Pets] p 
+join [dbo].[ProceduresHistory] h on h.PetID=p.PetId
+join [dbo].[Procedures] d on d.ProcedureId=h.ProcedureId 
+join [dbo].[ProcedureTypes] t on t.ProcedureTypeId=d.ProcedureTypeId
+where t.Name='ORTHOPEDIC' and YEAR(h.ProcedureDate)=p.BirthYear
+--19. გამოიტანეთ ქალაქ Dutton-ში მცხოვრები პირების გვარი და სახელი, რომლებმაც საკუთარ თუთიყუშს 
+--ჩაუტარეს სამედიცინო პროცედურა 2016 წლის ოქტომბრის მეორე ნახევარში. მესამე სვეტში გამოიტანეთ 
+--თუთიყუშის სახელი. თუ თუთიყუშის ამ პერიოდში პროცედურა ჩაუტარდა რამდენიმეჯერ, გამოტანისას მისი 
+select distinct o.Surname, o.Name, p.Name from [dbo].[Owners] o 
+join [dbo].[Pets] p on p.OwnerID=o.OwnerID
+join [dbo].[PetTypes] t on t.PetTypeId=p.PetTypeId
+join [dbo].[ProceduresHistory] h on h.PetID=p.PetId
+where t.Name='Parrot' and YEAR(h.ProcedureDate)=2016
+and MONTH(h.ProcedureDate)=10 and DAY(h.ProcedureDate)>15 
+--და მფლობელის მონაცემები გამოიტანეთ მხოლოდ ერთხელ; ცხრილების გაერთიანება subquery-ის საშუალებით. 
+--აკრძალულია join ოპერატორის გამოყენება.
+--20. გამოიტანეთ ყველაზე იაფფასიანი პროცედურების აღწერა (Description) და ფასი (Price); 
+select p.Description, p.Price from [dbo].[Procedures] p where Price in 
+(select MIN(p.Price) from [dbo].[Procedures] p)
+--21. გამოიტანეთ ქალაქებში Detroit ან Lansing -ში მცხოვრებ იმ პირთა რაოდენობა, რომლებსაც ჰყავთ ძაღლი (Dog) 
+--ან კატა (Cat); 
+select COUNT(*) from [dbo].[Owners] o where o.City in ('Detroit', 'Lansing') and o.OwnerID in
+(select p.OwnerID from [dbo].[Pets] p where p.PetTypeId in 
+(select t.PetTypeId from [dbo].[PetTypes] t where t.Name in ('dog','cat')))
+--22. გამოიტანეთ 2016 წლის იანვარში საშუალოზე იაფად ღირებული პროცედურების ჩატარების თარიღები. თუ 
+--ერთ დღეს ჩატარდა ორი ან მეტი ასეთი პროცედურა, თარიღი გამოიტანეთ მხოლოდ ერთხელ; 
+select distinct h.ProcedureDate from  [dbo].[ProceduresHistory] h where h.ProcedureId in
+(select p.ProcedureId from [dbo].[Procedures] p where p.Price <
+(select AVG(p.Price) from [dbo].[Procedures] p))
+and MONTH(h.ProcedureDate)=1 and YEAR(h.ProcedureDate)=2016
+
+select distinct h.ProcedureDate from  [dbo].[ProceduresHistory] h where h.ProcedureId in
+(select p.ProcedureId from [dbo].[Procedures] p where p.Price <
+(select AVG(p.Price) from [dbo].[Procedures] p where p.ProcedureId in
+(select h.ProcedureId from [dbo].[ProceduresHistory] h where MONTH(h.ProcedureDate)=1 and YEAR(h.ProcedureDate)=2016 )))
+--მონაცემთა დაჯგუფება 
+--23. გამოიტანეთ ჩატარებული პროცედურების რაოდენობა ცხოველთა ტიპების მიხედვით. შედეგად უნდა მიიღოთ 
+--ვირტუალური ცხრილი, რომელსაც ექნება 2 სვეტი და 3 სტრიქონი; 
+select t.Name, COUNT(*) from  [dbo].[PetTypes] t 
+join [dbo].[Pets] p on p.PetTypeId=t.PetTypeId
+join [dbo].[ProceduresHistory] h on h.PetID=p.PetId
+group by t.Name
+--24. გამოიტანეთ პროცედურის ტიპები და თითოეულ მათგანში ყველაზე იაფი პროცედურის ღირებულება. 
+--შედეგად უნდა მიიღოთ ვირტუალური ცხრილი, რომელსაც ექნება 2 სვეტი და 6 სტრიქონი. მონაცემები 
+--დაალაგეთ ღირებულების ზრდადობის მიხედვით; 
+select t.Name, MIN(d.Price) from  [dbo].[ProcedureTypes] t 
+join [dbo].[Procedures] d on d.ProcedureTypeId=t.ProcedureTypeId
+group by t.Name
+order by MIN(d.Price) asc 
+--25. გამოიტანეთ პირების სახელი, გვარი და მათი ცხოველთა რაოდენობა მხოლოდ იმ პირებისათვის, რომლებსაც 
+--ჰყავთ ერთზე მეტი ცხოველი; 
+select o.Name, o.Surname, COUNT(*) from [dbo].[Owners] o 
+join [dbo].[Pets] p on p.OwnerID=o.OwnerID
+group by o.Name, o.Surname
+having COUNT(*) > 1 
+--26. გამოიტანეთ 2016 წლის ზაფხულში ჩატარებული პროცედურების რაოდენობა თვეების მიხედვით. პირველ 
+--სვეტში გამოიტანეთ ზაფხულის თვეები ინგლისურ ენაზე, მეორე სვეტში კი პროცედურების რაოდენობა. 
+--მონაცემები დაალაგეთ პროცედურების რაოდენობის ზრდადობის მიხედვით; 
+select DATENAME(mm, h.ProcedureDate), COUNT(*) from [dbo].[Procedures] p 
+join [dbo].[ProceduresHistory] h on h.ProcedureId=p.ProcedureId
+where MONTH(h.ProcedureDate) between 6 and 8
+group by DATENAME(mm, h.ProcedureDate)
+order by 2  asc
+--მონაცემების დამატება, განახლება და წაშლა subquery-ის გამოყენებით 
+--27. სამედიცინო პროცედურების ცხრილში დაამატეთ ახალი პროცედურა Carding რომლის პროცედურის ტიპის 
+--არის GROOMING. აღწერაში (Description) ჩაწერეთ removes the undercoat, ხოლო ფასში -17; 
+INSERT INTO [dbo].[Procedures] (Description, Price, ProcedureTypeId)
+values ('REMOVES THE UNDERCOAT', 17 , (select [dbo].[ProcedureTypes].ProcedureTypeId from [dbo].[ProcedureTypes]
+where [dbo].[ProcedureTypes].Name = 'GROOMING' ))
+--28. ძაღლმა სახელად Jake შეიცვალა მფლობელი. ახალი მფლობელია Luisa Cuellar. ასახეთ ეს ცვლილება dbo.Pets 
+--ცხრილში - განაახლეთ Jake -ის ძველი მფლობელი ახლით.; 
+UPDATE [dbo].[Pets] SET [dbo].[Pets].OwnerID = (select [dbo].[Owners].OwnerID from [dbo].[Owners] 
+where Name = 'Luisa' and Surname = 'Cuellar') 
+where [dbo].[Pets].Name = 'Jake' and [dbo].[Pets].PetTypeId = 
+(select [dbo].[PetTypes].PetTypeId from [dbo].[PetTypes] where [dbo].[PetTypes].Name = 'Dog') 
+--29. იმ ქირურგიული (GENERAL SURGERIES) პროცედურების ღირებულება, რომელთა ფასი აღემატება 480 -ს,
+--შეამცირეთ 8 % -ით;
+UPDATE [dbo].[Procedures] SET [dbo].[Procedures].Price = 0.92 * Price 
+where Price > 480 and [dbo].[Procedures].ProcedureTypeId in 
+(select [dbo].[ProcedureTypes].ProcedureTypeId from [dbo].[ProcedureTypes] where Name = 'General Surgeries') 
+--30. პროცედურების ისტორიიდან (dbo.ProceduresHistory) წაშალეთ მონაცემები 2016 წლის სექტემბერში
+--ჩატარებული აცრების (VACCINATIONS) შესახებ.
+DELETE FROM [dbo].[ProceduresHistory] WHERE MONTH(ProcedureDate) = 9 and 
+ProcedureId in 
+(select [dbo].[Procedures].ProcedureId from [dbo].[Procedures] where ProcedureTypeId in 
+(select [dbo].[ProcedureTypes].ProcedureTypeId from [dbo].[ProcedureTypes] where Name = 'VACCINATIONS')) 
+--T-SQL პროცედურები 
+--31. შექმენით პროცედურა, რომელსაც გადაეცემა ორი პარამეტრი: ცხოველის მფლობელის საცხოვრებელი 
+--ქალაქის სახელი და სამედიცინო პროცედურის ჩატარების თარიღი. პროცედურამ უნდა დააბრუნოს ცხრილი, 
+--რომელშიც იქნება მონაცემები ამ ქალაქში და თარიღში ჩატარებული სამედიცინო პროცედურების შესახებ: 
+--ცხოველის სახელი, ცხოველის ტიპი, სამედიცინო პროცედურის ჩატარების თარიღი და ღირებულება, 
+--ცხოველის მფლობელის ქალაქი. თუ გადაცემული პარამეტრების მიხედვით მონაცემები არ მოიძებნა, 
+--პროცედურამ უნდა დააბრუნოს შეტყობინება: Record not found. 
+create Procedure Proc01 
+@City nvarchar(50), 
+@Date date 
+as
+IF(@City in (select [dbo].[Owners].City from [dbo].[Owners]) and 
+@Date in (select [dbo].[ProceduresHistory].ProcedureDate 
+from [dbo].[ProceduresHistory]))  
+	BEGIN
+	select [dbo].[Pets].Name, [dbo].[PetTypes].Name, [dbo].[ProceduresHistory].ProcedureDate, [dbo].[Procedures].Price 
+	from [dbo].[Pets]
+	join [dbo].[PetTypes] on [dbo].[PetTypes].PetTypeId = [dbo].[Pets].PetTypeId 
+	join [dbo].[Owners] on [dbo].[Owners].OwnerID = [dbo].[Pets].OwnerID 
+	join [dbo].[ProceduresHistory] on [dbo].[ProceduresHistory].PetID = [dbo].[Pets].PetId 
+	join [dbo].[Procedures] on [dbo].[Procedures].ProcedureId = [dbo].[ProceduresHistory].ProcedureId
+	where @City = [dbo].[Owners].City and @Date = [dbo].[ProceduresHistory].ProcedureDate 
+	END
+ELSE BEGIN Print 'Record Not Found' END 
+
+exec Proc01 'Lansing', '2016-11-16'  
+exec Proc01 'Lansings', '2016-11-17' 
+--32. შექმენით პროცედურა, რომელსაც პარამეტრად გადაეცემა სამედიცინო პროცედურის ტიპი სრულად ან 
+--ნაწილობრივ. პროცედურამ უნდა დააბრუნოს რიცხვი (რაოდენობა), რამდენჯერაც ჩატარდა ამ ტიპის 
+--სამედიცინო პროცედურა.
+create Procedure Proc04 
+@ProcName nvarchar(50) 
+as
+select Name, COUNT(*) from [dbo].[ProcedureTypes] 
+join [dbo].[Procedures] on [dbo].[Procedures].ProcedureTypeId = [dbo].[ProcedureTypes].ProcedureTypeId
+join [dbo].[ProceduresHistory] on [dbo].[ProceduresHistory].ProcedureId = [dbo].[Procedures].ProcedureId 
+where [dbo].[ProcedureTypes].Name like '%' + @ProcName + '%' 
+group by Name 
+
+exec Proc04 'Vac' 
+exec Proc04 'V' 
+exec Proc04 'HOSPIT'
+exec Proc04 'ORTHO' 
